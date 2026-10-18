@@ -128,6 +128,13 @@
             flex-direction: column;
             gap: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: #ef4444;
+            transform: translateY(-2px);
         }
 
         .card-header {
@@ -185,11 +192,12 @@
             background: #3b82f6;
             color: #fff;
             text-align: center;
-            padding: 5px;
-            font-size: 11px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 6px;
             text-decoration: none;
-            margin-top: 4px;
+            font-weight: 600;
+            transition: background 0.2s;
         }
 
         .link-btn:hover {
@@ -202,6 +210,156 @@
             color: #94a3b8;
             padding: 40px;
             font-size: 15px;
+        }
+
+        /* --- Full Page / Large Detail View Overlay --- */
+        .full-page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0b1120;
+            z-index: 9999;
+            overflow-y: auto;
+            display: none;
+            padding: 20px 15px;
+        }
+
+        .full-page-overlay.active {
+            display: block;
+        }
+
+        .detail-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #161e2e;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .back-btn {
+            align-self: flex-start;
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Large Image Gallery Section - Top Position */
+        .large-image-gallery {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .large-image-card {
+            flex: 1;
+            min-width: 280px;
+            background: #0f172a;
+            border: 1.5px solid #1f2937;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .large-image-card label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .large-image-card img {
+            width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #000000;
+        }
+
+        /* Information Section Styles */
+        .info-card {
+            background: #0f172a;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ef4444;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item {
+            background: #161e2e;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #1f2937;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .info-item b {
+            color: #94a3b8;
+            display: block;
+            font-size: 11px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .description-box {
+            background: #161e2e;
+            padding: 14px;
+            border-radius: 6px;
+            border: 1px solid #1f2937;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #e2e8f0;
+            white-space: pre-line;
+        }
+
+        .description-box b {
+            color: #94a3b8;
+            display: block;
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -226,7 +384,7 @@
             <button class="nav-link" onclick="filterCategory('ঘুষ ও দুর্নীতি', this)">ঘুষ ও দুর্নীতি</button>
             <button class="nav-link" onclick="filterCategory('পরকীয়া', this)">পরকীয়া</button>
             <button class="nav-link" onclick="filterCategory('ডাকাতি', this)">ডাকাতি</button>
-            <button class="nav-link" onclick="filterCategory('অপহরণ', this)">অপহরণ</button>
+            <button class="nav-link" onclick="filterCategory(' অপহরণ', this)"> অপহরণ</button>
             <button class="nav-link" onclick="filterCategory('মারধর ও গুরুতর আঘাত', this)">মারধর</button>
             <button class="nav-link" onclick="filterCategory('যৌতুক নির্যাতন', this)">যৌতুক নির্যাতন</button>
             <button class="nav-link" onclick="filterCategory('রাষ্ট্রদ্রোহিতা', this)">রাষ্ট্রদ্রোহিতা</button>
@@ -242,8 +400,48 @@
         <div class="loading-text">ডেটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</div>
     </div>
 
+    <!-- Full Screen Detailed View Page -->
+    <div id="fullPageOverlay" class="full-page-overlay">
+        <div class="detail-container">
+            <button class="back-btn" onclick="closeFullPage()">← ফিরে যান</button>
+            
+            <!-- Large Images Section (On Top) -->
+            <div class="large-image-gallery" id="largeImageGallery"></div>
+
+            <!-- Detail Text Section -->
+            <div class="info-card">
+                <div class="info-title" id="detailSubject"></div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <b>তারিখ</b>
+                        <span id="detailDate"></span>
+                    </div>
+                    <div class="info-item">
+                        <b>আসামির নাম</b>
+                        <span id="detailAccused"></span>
+                    </div>
+                    <div class="info-item" id="detailVictimContainer">
+                        <b>শিকার / ভিকটিমের নাম</b>
+                        <span id="detailVictim"></span>
+                    </div>
+                    <div class="info-item">
+                        <b>বিচার</b>
+                        <span id="detailJustice"></span>
+                    </div>
+                </div>
+
+                <div class="description-box">
+                    <b>সম্পূর্ণ বিবরণ</b>
+                    <span id="detailDescription"></span>
+                </div>
+
+                <div id="detailProofContainer" style="margin-top: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // আপনার গিটহব থেকে একটিমাত্র JSON ফাইলের Raw লিংক এখানে বসাবেন
         const jsonUrl = "https://raw.githubusercontent.com/Sobujaka/-/refs/heads/main/all_data.json";
 
         let allData = [];
@@ -300,9 +498,10 @@
                 return;
             }
 
-            items.forEach(item => {
+            items.forEach((item) => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.onclick = () => openFullPage(item);
 
                 const isMissing = item.বিষয় && item.বিষয়.includes('নিখোজ');
                 const titleText = item.বিষয় ? item.বিষয় : 'তথ্য নেই';
@@ -316,12 +515,12 @@
                     <div class="images-container">
                         <div class="image-box">
                             <span>${isMissing ? 'নিখোঁজ ব্যক্তির ছবি' : 'আসামির ছবি'}</span>
-                            <img src="${culpritImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="আসামির ছবি">
+                            <img src="${culpritImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="ছবি">
                         </div>
                         ${!isMissing ? `
                         <div class="image-box">
                             <span>শিকারের ছবি</span>
-                            <img src="${victimImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="শিকারের ছবি">
+                            <img src="${victimImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="ছবি">
                         </div>` : ''}
                     </div>
                     <div class="card-details">
@@ -329,12 +528,62 @@
                         <span><b>আসামির নাম:</b> ${item.আসামির_নাম || 'অজ্ঞাত'}</span>
                         ${victimNameText ? `<span><b>শিকার/ভিকটিম:</b> ${victimNameText}</span>` : ''}
                         <span><b>বিচার:</b> ${item.বিচার || 'হয়নি'}</span>
-                        ${item.লেখা ? `<span><b>বিবরণ:</b> ${item.লেখা}</span>` : ''}
-                        ${item.প্রমান_ছবি_ভিডিও_লিংক ? `<a href="${item.প্রমান_ছবি_ভিডিও_লিংক}" target="_blank" class="link-btn">প্রমাণ দেখুন</a>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function openFullPage(item) {
+            const isMissing = item.বিষয় && item.বিষয়.includes('নিখোজ');
+            let culpritImage = item.আসামির_ছবি || item.আসামির_ছবি_ছেলে || '';
+            let victimImage = item.শিকার_ছবি || item.আসামির_ছবি_মেয়ে || '';
+            let victimNameText = item.শিকার_নাম || item.শিকারের_নাম || item.নিখোঁজ_ব্যক্তির_নাম || '';
+
+            // 1. Load Big Images First (At the Top)
+            const gallery = document.getElementById('largeImageGallery');
+            gallery.innerHTML = `
+                <div class="large-image-card">
+                    <label>${isMissing ? 'নিখোঁজ ব্যক্তির ছবি' : 'আসামির ছবি'}</label>
+                    <img src="${culpritImage || 'https://via.placeholder.com/400x300?text=No+Image'}" alt="ছবি">
+                </div>
+                ${!isMissing ? `
+                <div class="large-image-card">
+                    <label>শিকারের ছবি</label>
+                    <img src="${victimImage || 'https://via.placeholder.com/400x300?text=No+Image'}" alt="ছবি">
+                </div>` : ''}
+            `;
+
+            // 2. Fill Details Text
+            document.getElementById('detailSubject').innerText = item.বিষয় || 'বিস্তারিত তথ্য';
+            document.getElementById('detailDate').innerText = item.তারিখ || 'অনির্দিষ্ট';
+            document.getElementById('detailAccused').innerText = item.আসামির_নাম || 'অজ্ঞাত';
+
+            const victimContainer = document.getElementById('detailVictimContainer');
+            if (victimNameText) {
+                victimContainer.style.display = 'block';
+                document.getElementById('detailVictim').innerText = victimNameText;
+            } else {
+                victimContainer.style.display = 'none';
+            }
+
+            document.getElementById('detailJustice').innerText = item.বিচার || 'হয়নি';
+            document.getElementById('detailDescription').innerText = item.লেখা || 'কোন বিবরণ দেওয়া নেই।';
+
+            const proofContainer = document.getElementById('detailProofContainer');
+            if (item.প্রমান_ছবি_ভিডিও_লিংক) {
+                proofContainer.innerHTML = `<a href="${item.প্রমান_ছবি_ভিডিও_লিংক}" target="_blank" class="link-btn">🔗 প্রমাণ/ভিডিও লিঙ্ক দেখুন</a>`;
+            } else {
+                proofContainer.innerHTML = '';
+            }
+
+            // Open Full Screen Page
+            document.getElementById('fullPageOverlay').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function closeFullPage() {
+            document.getElementById('fullPageOverlay').classList.remove('active');
         }
 
         fetchAllData();
