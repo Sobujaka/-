@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অপরাধ ও নিখোঁজ তথ্য পোর্টাল</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b1120;
+            color: #ffffff;
+            padding: 15px;
+        }
+
+        .navbar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px 0;
+            margin-bottom: 25px;
+        }
+
+        .brand-title {
+            color: #ef4444;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* Search Section Styles */
+        .search-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            background: #161e2e;
+            border: 1.5px solid #1f2937;
+            padding: 8px 14px;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box::placeholder {
+            color: #64748b;
+        }
+
+        .search-box:focus {
+            border-color: #ef4444;
+        }
+
+        /* Single Row Scrollable Category Bar */
+        .nav-links-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 0;
+            max-width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 #0b1120;
+        }
+
+        .nav-links-row::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .nav-links-row::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        .nav-link {
+            background: #161e2e;
+            border: 1px solid #1f2937;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover { color: #ffffff; background: #1f2937; }
+
+        .nav-link.active {
+            color: #ffffff;
+            font-weight: 600;
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #161e2e;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1f2937;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ef4444;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 6px;
+        }
+
+        .images-container {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .image-box {
+            flex: 1;
+            background: #0f172a;
+            border: 1px dashed #334155;
+            border-radius: 6px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .image-box span {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #1e293b;
+        }
+
+        .card-details {
+            font-size: 12px;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .card-details span b {
+            color: #ffffff;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: #3b82f6;
+            color: #fff;
+            text-align: center;
+            padding: 5px;
+            font-size: 11px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 4px;
+        }
+
+        .link-btn:hover {
+            background: #2563eb;
+        }
+
+        .loading-text {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #94a3b8;
+            padding: 40px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="brand-title">অপরাধ ও নিখোঁজ তথ্য পোর্টাল</div>
+        
+        <div class="search-container">
+            <input type="text" id="accusedSearch" class="search-box" placeholder="🔍 আসামির নাম দিয়ে খুঁজুন..." oninput="applySearchFilter()">
+            <input type="text" id="victimSearch" class="search-box" placeholder="🔍 শিকার/ভিকটিমের নাম দিয়ে খুঁজুন..." oninput="applySearchFilter()">
+            <input type="text" id="dateSearch" class="search-box" placeholder="🔍 তারিখ দিয়ে খুঁজুন..." oninput="applySearchFilter()">
+        </div>
+
+        <div class="nav-links-row" id="categoryNav">
+            <button class="nav-link active" onclick="filterCategory('সকল', this)">সকল</button>
+            <button class="nav-link" onclick="filterCategory('ধর্ষণ,খুন', this)">ধর্ষণ ও খুন</button>
+            <button class="nav-link" onclick="filterCategory('খুন', this)">খুন</button>
+            <button class="nav-link" onclick="filterCategory('চাদাবাজি,খুন', this)">চাঁদাবাজি ও খুন</button>
+            <button class="nav-link" onclick="filterCategory('জমি-দখল', this)">জমি-দখল</button>
+            <button class="nav-link" onclick="filterCategory('টাকা-পাচার', this)">টাকা-পাচার</button>
+            <button class="nav-link" onclick="filterCategory('ঘুষ ও দুর্নীতি', this)">ঘুষ ও দুর্নীতি</button>
+            <button class="nav-link" onclick="filterCategory('পরকীয়া', this)">পরকীয়া</button>
+            <button class="nav-link" onclick="filterCategory('ডাকাতি', this)">ডাকাতি</button>
+            <button class="nav-link" onclick="filterCategory('অপহরণ', this)">অপহরণ</button>
+            <button class="nav-link" onclick="filterCategory('মারধর ও গুরুতর আঘাত', this)">মারধর</button>
+            <button class="nav-link" onclick="filterCategory('যৌতুক নির্যাতন', this)">যৌতুক নির্যাতন</button>
+            <button class="nav-link" onclick="filterCategory('রাষ্ট্রদ্রোহিতা', this)">রাষ্ট্রদ্রোহিতা</button>
+            <button class="nav-link" onclick="filterCategory('সাইবার অপরাধ ও হ্যাকিং', this)">সাইবার অপরাধ</button>
+            <button class="nav-link" onclick="filterCategory('বেআইনি সমাবেশ ও দাঙ্গা', this)">দাঙ্গা</button>
+            <button class="nav-link" onclick="filterCategory('জালিয়াতি', this)">জালিয়াতি</button>
+            <button class="nav-link" onclick="filterCategory('প্রতারণা', this)">প্রতারণা</button>
+            <button class="nav-link" onclick="filterCategory('নিখোজ', this)">নিখোঁজ</button>
+        </div>
+    </div>
+
+    <div id="main-content" class="media-grid">
+        <div class="loading-text">ডেটা লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</div>
+    </div>
+
+    <script>
+        // আপনার গিটহব থেকে একটিমাত্র JSON ফাইলের Raw লিংক এখানে বসাবেন
+        const jsonUrl = "https://raw.githubusercontent.com/Sobujaka/STREMXBD/refs/main/all_data.json";
+
+        let allData = [];
+        let currentSelectedCategory = 'সকল';
+
+        async function fetchAllData() {
+            try {
+                const response = await fetch(jsonUrl);
+                if (!response.ok) throw new Error('Network error');
+                allData = await response.json();
+                renderCards(allData);
+            } catch (error) {
+                console.error("ডেটা ফেচ করতে সমস্যা হয়েছে:", error);
+                document.getElementById('main-content').innerHTML = `<div class="loading-text" style="color: #ef4444;">গিটহব থেকে ডেটা লোড করা যায়নি।</div>`;
+            }
+        }
+
+        function filterCategory(category, element) {
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            currentSelectedCategory = category;
+            applySearchFilter();
+        }
+
+        function applySearchFilter() {
+            const accusedQuery = document.getElementById('accusedSearch').value.toLowerCase().trim();
+            const victimQuery = document.getElementById('victimSearch').value.toLowerCase().trim();
+            const dateQuery = document.getElementById('dateSearch').value.toLowerCase().trim();
+
+            const filteredData = allData.filter(item => {
+                const categoryMatch = currentSelectedCategory === 'সকল' || item.বিষয় === currentSelectedCategory;
+                
+                const accusedName = (item.আসামির_নাম || '').toLowerCase();
+                const victimName = (item.শিকার_নাম || item.শিকারের_নাম || item.নিখোঁজ_ব্যক্তির_নাম || '').toLowerCase();
+                const dateVal = (item.তারিখ || '').toLowerCase();
+
+                const matchesAccused = accusedQuery === '' || accusedName.includes(accusedQuery);
+                const matchesVictim = victimQuery === '' || victimName.includes(victimQuery);
+                const matchesDate = dateQuery === '' || dateVal.includes(dateQuery);
+
+                return categoryMatch && matchesAccused && matchesVictim && matchesDate;
+            });
+
+            renderCards(filteredData);
+        }
+
+        function renderCards(items) {
+            const container = document.getElementById('main-content');
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = `<div class="loading-text">কোন তথ্য পাওয়া যায়নি।</div>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const isMissing = item.বিষয় && item.বিষয়.includes('নিখোজ');
+                const titleText = item.বিষয় ? item.বিষয় : 'তথ্য নেই';
+
+                let culpritImage = item.আসামির_ছবি || item.আসামির_ছবি_ছেলে || '';
+                let victimImage = item.শিকার_ছবি || item.আসামির_ছবি_মেয়ে || '';
+                let victimNameText = item.শিকার_নাম || item.শিকারের_নাম || item.নিখোঁজ_ব্যক্তির_নাম || '';
+
+                card.innerHTML = `
+                    <div class="card-header">${titleText}</div>
+                    <div class="images-container">
+                        <div class="image-box">
+                            <span>${isMissing ? 'নিখোঁজ ব্যক্তির ছবি' : 'আসামির ছবি'}</span>
+                            <img src="${culpritImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="আসামির ছবি">
+                        </div>
+                        ${!isMissing ? `
+                        <div class="image-box">
+                            <span>শিকারের ছবি</span>
+                            <img src="${victimImage || 'https://via.placeholder.com/150?text=No+Image'}" alt="শিকারের ছবি">
+                        </div>` : ''}
+                    </div>
+                    <div class="card-details">
+                        <span><b>তারিখ:</b> ${item.তারিখ || 'অনির্দিষ্ট'}</span>
+                        <span><b>আসামির নাম:</b> ${item.আসামির_নাম || 'অজ্ঞাত'}</span>
+                        ${victimNameText ? `<span><b>শিকার/ভিকটিম:</b> ${victimNameText}</span>` : ''}
+                        <span><b>বিচার:</b> ${item.বিচার || 'হয়নি'}</span>
+                        ${item.লেখা ? `<span><b>বিবরণ:</b> ${item.লেখা}</span>` : ''}
+                        ${item.প্রমান_ছবি_ভিডিও_লিংক ? `<a href="${item.প্রমান_ছবি_ভিডিও_লিংক}" target="_blank" class="link-btn">প্রমাণ দেখুন</a>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        fetchAllData();
+    </script>
+</body>
+</html>
